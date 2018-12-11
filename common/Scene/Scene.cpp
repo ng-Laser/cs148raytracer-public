@@ -39,7 +39,18 @@ bool Scene::Trace(class Ray* inputRay, IntersectionState* outputIntersection) co
 
         const glm::vec3 intersectionPoint = outputIntersection->intersectionRay.GetRayPosition(outputIntersection->intersectionT);
         const float NdR = glm::dot(inputRay->GetRayDirection(), outputIntersection->ComputeNormal());
-        // send out reflection ray.
+        
+		// Noa_TODO Here: take care of alpha
+		if (currentMaterial->ComputeTransparency(*outputIntersection)) {
+			outputIntersection->reflectionIntersection = std::make_shared<IntersectionState>(outputIntersection->remainingReflectionBounces - 1, outputIntersection->remainingRefractionBounces);
+
+			Ray reflectionRay;
+			PassRayThrough(reflectionRay, *inputRay, intersectionPoint);
+			return Trace(&reflectionRay, outputIntersection->reflectionIntersection.get());
+			// don't do any other rays
+		}
+
+		// send out reflection ray.
         if (currentMaterial->IsReflective() && outputIntersection->remainingReflectionBounces > 0) {
             outputIntersection->reflectionIntersection = std::make_shared<IntersectionState>(outputIntersection->remainingReflectionBounces - 1, outputIntersection->remainingRefractionBounces);
 
@@ -79,6 +90,13 @@ void Scene::PerformRayRefraction(Ray& outputRay, const Ray& inputRay, const glm:
     outputRay.SetRayPosition(intersectionPoint + LARGE_EPSILON * refractionDir);
     outputRay.SetRayDirection(refractionDir);
 }
+
+void Scene::PassRayThrough(Ray& outputRay, const Ray& inputRay, const glm::vec3& intersectionPoint) const
+{
+	outputRay.SetRayPosition(intersectionPoint + (inputRay.GetRayDirection() * .1f));
+	outputRay.SetRayDirection(inputRay.GetRayDirection());
+}
+
 
 void Scene::AddSceneObject(std::shared_ptr<SceneObject> object)
 {

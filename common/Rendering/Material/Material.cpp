@@ -4,6 +4,10 @@
 #include "common/Scene/Lights/Light.h"
 #include "assimp/material.h"
 
+#include "common/Utility/Texture/TextureLoader.h"
+#include "common/Rendering/Textures/Texture2D.h"
+
+
 Material::Material():
     reflectivity(0.f), transmittance(0.f), indexOfRefraction(1.f)
 {
@@ -55,6 +59,16 @@ glm::vec3 Material::ComputeDiffuse(const struct IntersectionState& intersection,
 glm::vec3 Material::ComputeSpecular(const struct IntersectionState& intersection, const glm::vec3& lightColor, const float NdL, const float NdH, const float NdV, const float VdH) const
 {
     return glm::vec3();
+}
+
+// if transparent return 1, else return 0
+bool Material::ComputeTransparency(const IntersectionState& intersection) const
+{
+	if (!textureStorage.count("alphaTexure")) {
+		return false;
+	}
+	return (textureStorage.find("alphaTexure") != textureStorage.end()) ?
+		glm::vec3(textureStorage.at("alphaTexure")->Sample(intersection.ComputeUV()))[0] > 0 : 0;
 }
 
 glm::vec3 Material::ComputeReflection(const class Renderer* renderer, const struct IntersectionState& intersection) const

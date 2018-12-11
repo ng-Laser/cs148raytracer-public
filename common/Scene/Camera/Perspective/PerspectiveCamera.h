@@ -6,7 +6,7 @@ class PerspectiveCamera : public Camera
 {
 public:
     // inputFov is in degrees. 
-    PerspectiveCamera(float aspectRatio, float inputFov);
+    PerspectiveCamera(float aspectRatio, float inputFov, float zNear=0.f, float zFar=std::numeric_limits<float>::max());
     virtual std::shared_ptr<class Ray> GenerateRayForNormalizedCoordinates(glm::vec2 coordinate) const override;
 
     void SetZNear(float input);
