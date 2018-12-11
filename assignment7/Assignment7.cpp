@@ -43,8 +43,20 @@ std::shared_ptr<Scene> Assignment7::CreateScene() const
 	std::shared_ptr<Scene> newScene = std::make_shared<Scene>();
 	std::shared_ptr<SceneObject> iguanabranchSceneObject = std::make_shared<SceneObject>();
 	std::shared_ptr<SceneObject> TreeSceneObject = std::make_shared<SceneObject>();
+	std::shared_ptr<SceneObject> DragonFlyObject = std::make_shared<SceneObject>();
+	std::shared_ptr<SceneObject> BackgroundObject = std::make_shared<SceneObject>();
 
-	// std::thread t1(get_pixel_values, 0, total / 8);
+	// background
+	std::vector<std::shared_ptr<aiMaterial>> backgroundMaterials;
+	std::vector<std::shared_ptr<MeshObject>> backgroundObjs = MeshLoader::LoadMesh("background_plane.obj", &backgroundMaterials);
+	std::shared_ptr<BlinnPhongMaterial> backgroundMat = std::make_shared<BlinnPhongMaterial>();
+	backgroundMat->SetDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
+	backgroundMat->SetSpecular(glm::vec3(0.0f, 0.0f, 0.0f), 40.f);
+	backgroundMat->SetReflectivity(0.f);
+	backgroundMat->SetTexture("diffuseTexture", TextureLoader::LoadTexture("background/forest_bokeh.jpg"));
+	backgroundObjs[0]->SetMaterial(backgroundMat);
+	BackgroundObject->AddMeshObject(backgroundObjs[0]);
+
 	// Branch
 	std::vector<std::shared_ptr<aiMaterial>> loadedBranchMaterials;
 	std::vector<std::shared_ptr<MeshObject>> branchMeshObjs = MeshLoader::LoadMesh("branch_positioned.obj", &loadedBranchMaterials);
@@ -84,6 +96,17 @@ std::shared_ptr<Scene> Assignment7::CreateScene() const
 	iguanabranchSceneObject->AddMeshObject(iguanaMeshObjs[0]);
 	iguanabranchSceneObject->AddMeshObject(eyeMeshObjs[0]);
 	iguanabranchSceneObject->AddMeshObject(tongueMeshObjs[0]);
+
+	// dragonfly 
+	std::vector<std::shared_ptr<aiMaterial>> loadedDragonflyMaterials;
+	std::vector<std::shared_ptr<MeshObject>> dragonflyMeshObjs = MeshLoader::LoadMesh("dragonfly.obj", &loadedDragonflyMaterials);
+	std::shared_ptr<BlinnPhongMaterial> dragonflyMat = std::make_shared<BlinnPhongMaterial>();
+	dragonflyMat->SetReflectivity(0.f);
+	dragonflyMat->SetTexture("diffuseTexture", TextureLoader::LoadTexture("dragonfly/combined.jpg"));
+	dragonflyMat->SetDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
+	dragonflyMat->SetSpecular(glm::vec3(1.0f, 1.0f, 1.0f), 40.f);
+	dragonflyMeshObjs[0]->SetMaterial(dragonflyMat);
+	DragonFlyObject->AddMeshObject(dragonflyMeshObjs[0]);
 
 	// Tree (trunk)
 	std::vector<std::shared_ptr<aiMaterial>> TreeMaterials;
@@ -154,9 +177,9 @@ std::shared_ptr<Scene> Assignment7::CreateScene() const
 // z needs to go to x, and x needs to go to z
 
 	iguanabranchSceneObject->Rotate(glm::vec3(SceneObject::GetWorldUp()), 3.141592f*.5f); // rotating to face right
-
 	TreeSceneObject->Rotate(glm::vec3(SceneObject::GetWorldUp()), 3.141592f*.5f);
-	//TreeSceneObject->Rotate(glm::vec3(0.f, 0.f, 1.f), -.1f); // get world forward
+	DragonFlyObject->Rotate(glm::vec3(SceneObject::GetWorldUp()), 3.141592f*.5f);
+	BackgroundObject->Rotate(glm::vec3(SceneObject::GetWorldUp()), 3.141592f*.5f);
 
 	iguanabranchSceneObject->CreateAccelerationData(AccelerationTypes::BVH);
 	iguanabranchSceneObject->ConfigureAccelerationStructure([](AccelerationStructure* genericAccelerator) {
@@ -164,8 +187,31 @@ std::shared_ptr<Scene> Assignment7::CreateScene() const
 		accelerator->SetMaximumChildren(2);
 		accelerator->SetNodesOnLeaves(2);
 	});
-
 	iguanabranchSceneObject->ConfigureChildMeshAccelerationStructure([](AccelerationStructure* genericAccelerator) {
+		BVHAcceleration* accelerator = dynamic_cast<BVHAcceleration*>(genericAccelerator);
+		accelerator->SetMaximumChildren(2);
+		accelerator->SetNodesOnLeaves(2);
+	});
+
+	BackgroundObject->CreateAccelerationData(AccelerationTypes::BVH);
+	BackgroundObject->ConfigureAccelerationStructure([](AccelerationStructure* genericAccelerator) {
+		BVHAcceleration* accelerator = dynamic_cast<BVHAcceleration*>(genericAccelerator);
+		accelerator->SetMaximumChildren(2);
+		accelerator->SetNodesOnLeaves(2);
+	});
+	BackgroundObject->ConfigureChildMeshAccelerationStructure([](AccelerationStructure* genericAccelerator) {
+		BVHAcceleration* accelerator = dynamic_cast<BVHAcceleration*>(genericAccelerator);
+		accelerator->SetMaximumChildren(2);
+		accelerator->SetNodesOnLeaves(2);
+	});
+
+	DragonFlyObject->CreateAccelerationData(AccelerationTypes::BVH);
+	DragonFlyObject->ConfigureAccelerationStructure([](AccelerationStructure* genericAccelerator) {
+		BVHAcceleration* accelerator = dynamic_cast<BVHAcceleration*>(genericAccelerator);
+		accelerator->SetMaximumChildren(2);
+		accelerator->SetNodesOnLeaves(2);
+	});
+	DragonFlyObject->ConfigureChildMeshAccelerationStructure([](AccelerationStructure* genericAccelerator) {
 		BVHAcceleration* accelerator = dynamic_cast<BVHAcceleration*>(genericAccelerator);
 		accelerator->SetMaximumChildren(2);
 		accelerator->SetNodesOnLeaves(2);
@@ -187,6 +233,8 @@ std::shared_ptr<Scene> Assignment7::CreateScene() const
 
 	newScene->AddSceneObject(iguanabranchSceneObject);
 	newScene->AddSceneObject(TreeSceneObject);
+	newScene->AddSceneObject(DragonFlyObject);
+	newScene->AddSceneObject(BackgroundObject);
 
 	// Lights
 	std::shared_ptr<Light> areaLight = std::make_shared<AreaLight>(glm::vec2(30, 30));
