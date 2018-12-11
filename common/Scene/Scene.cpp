@@ -49,6 +49,10 @@ bool Scene::Trace(class Ray* inputRay, IntersectionState* outputIntersection) co
 			return Trace(&reflectionRay, outputIntersection->reflectionIntersection.get());
 			// don't do any other rays
 		}
+		// Noa_TODO Here: Take care of background
+		if (currentMaterial->isBackground) {
+			return true;
+		}
 
 		// send out reflection ray.
         if (currentMaterial->IsReflective() && outputIntersection->remainingReflectionBounces > 0) {

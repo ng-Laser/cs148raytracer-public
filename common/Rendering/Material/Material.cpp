@@ -34,6 +34,11 @@ glm::vec3 Material::ComputeNonLightDependentBRDF(const class Renderer* renderer,
 
 glm::vec3 Material::ComputeBRDF(const struct IntersectionState& intersection, const glm::vec3& lightColor, const class Ray& toLightRay, const class Ray& fromCameraRay, float lightAttenuation, bool computeDiffuse, bool computeSpecular) const
 {
+	// Noa: TODO: special case background
+	if (isBackground) {
+		return glm::vec3(textureStorage.at("diffuseTexture")->Sample(intersection.ComputeUV()));
+	}
+
     const glm::vec3 N = intersection.ComputeNormal();
     const glm::vec3 L = toLightRay.GetRayDirection();
     const glm::vec3 V = -1.f * fromCameraRay.GetRayDirection();

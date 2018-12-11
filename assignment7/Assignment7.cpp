@@ -51,9 +51,10 @@ std::shared_ptr<Scene> Assignment7::CreateScene() const
 	std::vector<std::shared_ptr<MeshObject>> backgroundObjs = MeshLoader::LoadMesh("background_plane.obj", &backgroundMaterials);
 	std::shared_ptr<BlinnPhongMaterial> backgroundMat = std::make_shared<BlinnPhongMaterial>();
 	backgroundMat->SetDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
-	backgroundMat->SetSpecular(glm::vec3(0.0f, 0.0f, 0.0f), 40.f);
 	backgroundMat->SetReflectivity(0.f);
-	backgroundMat->SetTexture("diffuseTexture", TextureLoader::LoadTexture("background/forest_bokeh.jpg"));
+	backgroundMat->SetTransmittance(0.f);
+	backgroundMat->SetTexture("diffuseTexture", TextureLoader::LoadTexture("background/forest_bokeh_less_bright.jpg"));
+	backgroundMat->isBackground = true;
 	backgroundObjs[0]->SetMaterial(backgroundMat);
 	BackgroundObject->AddMeshObject(backgroundObjs[0]);
 
@@ -307,5 +308,5 @@ int Assignment7::GetMaxRefractionBounces() const
 glm::vec2 Assignment7::GetImageOutputResolution() const
 {
 	//	return glm::vec2(185*2, 138.75*2);// 4*640.f, 4*480.f);
-	return glm::vec2(185 * 2, 136 * 2);// 4*640.f, 4*480.f);
+	return glm::vec2(185 * 5, 136 * 5);// 4*640.f, 4*480.f);
 }
