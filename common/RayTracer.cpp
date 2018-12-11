@@ -1,6 +1,8 @@
 // #include "stdafx.h"
 #include <thread>
-#include <omp.h>
+#include <vector>
+// #include <omp.h>
+
 
 #include "common/RayTracer.h"
 #include "common/Application.h"
@@ -60,12 +62,14 @@ void RayTracer::Run()
 	// #pragma omp parallel for num_threads(2)
 	// ctpl::thread_pool p(2 /* two threads in the pool */);
 
+	int w = static_cast<int>(currentResolution.x);
+
 	auto get_pixel_values = [&](int start, int end)
 	{
 //		#pragma omp parallel for num_threads(2)
 		for (int itr = start; itr < end; ++itr) {
-			int r = itr / static_cast<int>(currentResolution.x);
-			int c = itr % static_cast<int>(currentResolution.x);
+			int r = itr / w;
+			int c = itr % w;
 			// for (int r = 0; r < static_cast<int>(currentResolution.y); ++r) {
 			// 	for (int c = 0; c < static_cast<int>(currentResolution.x); ++c) {
 			//		printf("Thread number %d", omp_get_thread_num());
@@ -101,26 +105,32 @@ void RayTracer::Run()
 
 	//	for (int itr = 0; itr < static_cast<int>(currentResolution.y) * static_cast<int>(currentResolution.x); ++itr) {
 	int total = static_cast<int>(currentResolution.y) * static_cast<int>(currentResolution.x);
+	std::vector<std::thread> v;
+	int num_threads = 8;
+	for (int i = 0; i < num_threads; ++i) {
+		v.push_back(std::thread(get_pixel_values, total / num_threads * i, total / num_threads * (i + 1)));
+	}
+	for (int i = 0; i < num_threads; ++i) {
+		v[i].join();
+	}
 
+	//std::thread t1(get_pixel_values, 0, total/8);
+	//std::thread t2(get_pixel_values, total / 8, 2* total / 8);
+	//std::thread t3(get_pixel_values, 2 * total / 8, 3 * total / 8);
+	//std::thread t4(get_pixel_values, 3 * total / 8, 4 * total / 8);
+	//std::thread t5(get_pixel_values, 4 * total / 8, 5 * total / 8);
+	//std::thread t6(get_pixel_values, 5 * total / 8, 6 * total / 8);
+	//std::thread t7(get_pixel_values, 6 * total / 8, 7 * total / 8);
+	//std::thread t8(get_pixel_values, 7 * total / 8, total);
 
-	
-	std::thread t1(get_pixel_values, 0, total/8);
-	std::thread t2(get_pixel_values, total / 8, 2* total / 8);
-	std::thread t3(get_pixel_values, 2 * total / 8, 3 * total / 8);
-	std::thread t4(get_pixel_values, 3 * total / 8, 4 * total / 8);
-	std::thread t5(get_pixel_values, 4 * total / 8, 5 * total / 8);
-	std::thread t6(get_pixel_values, 5 * total / 8, 6 * total / 8);
-	std::thread t7(get_pixel_values, 6 * total / 8, 7 * total / 8);
-	std::thread t8(get_pixel_values, 7 * total / 8, total);
-
-	t1.join();
-	t2.join();
-	t3.join();
-	t4.join();
-	t5.join();
-	t6.join();
-	t7.join();
-	t8.join();
+	//t1.join();
+	//t2.join();
+	//t3.join();
+	//t4.join();
+	//t5.join();
+	//t6.join();
+	//t7.join();
+	//t8.join();
 	
 
 	// Apply post-processing steps (i.e. tone-mapper, etc.).
