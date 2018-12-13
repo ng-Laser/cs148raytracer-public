@@ -124,22 +124,22 @@ std::shared_ptr<Scene> Assignment7::CreateScene() const
 	std::vector<std::shared_ptr<MeshObject>> BranchMeshObjs = MeshLoader::LoadMesh("branches_cleaned_up.obj");
 	BranchMeshObjs[0]->SetMaterial(TreeMat);
 	TreeSceneObject->AddMeshObject(BranchMeshObjs[0]);
-
+	
 	// leaves 1
 	std::vector<std::shared_ptr<aiMaterial>> leaveas1Materials;
 	std::vector<std::shared_ptr<MeshObject>> leaves1MeshObjs = MeshLoader::LoadMesh("leaves_1.obj", &leaveas1Materials);
 	std::shared_ptr<BlinnPhongMaterial> leaves1Mat = std::make_shared<BlinnPhongMaterial>();
 	leaves1Mat->SetReflectivity(0.f);
 	leaves1Mat->SetTexture("diffuseTexture", TextureLoader::LoadTexture("tree/Textures/leaves_01.jpg"));
-	leaves1Mat->SetTexture("alphaTexure", TextureLoader::LoadTexture("tree/Textures/leaves_alpha.jpg"));
+	leaves1Mat->SetTexture("alphaTexture", TextureLoader::LoadTexture("tree/Textures/leaves_alpha.jpg"));
 	leaves1Mat->SetDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
 	leaves1Mat->SetSpecular(glm::vec3(0.0f, 0.0f, 0.0f), 40.f);
 	leaves1MeshObjs[0]->SetMaterial(leaves1Mat);
 	TreeSceneObject->AddMeshObject(leaves1MeshObjs[0]);
 
-	std::vector<std::shared_ptr<MeshObject>> leaves1MeshObjs_rev = MeshLoader::LoadMesh("leaves_1_rev.obj", &leaveas1Materials);
-	leaves1MeshObjs_rev[0]->SetMaterial(leaves1Mat);
-	TreeSceneObject->AddMeshObject(leaves1MeshObjs_rev[0]);
+	//std::vector<std::shared_ptr<MeshObject>> leaves1MeshObjs_rev = MeshLoader::LoadMesh("leaves_1_rev.obj", &leaveas1Materials);
+	//leaves1MeshObjs_rev[0]->SetMaterial(leaves1Mat);
+	//TreeSceneObject->AddMeshObject(leaves1MeshObjs_rev[0]);
 
 	// leaves 2
 	std::vector<std::shared_ptr<aiMaterial>> leaveas2Materials;
@@ -147,15 +147,14 @@ std::shared_ptr<Scene> Assignment7::CreateScene() const
 	std::shared_ptr<BlinnPhongMaterial> leaves2Mat = std::make_shared<BlinnPhongMaterial>();
 	leaves2Mat->SetReflectivity(0.f);
 	leaves2Mat->SetTexture("diffuseTexture", TextureLoader::LoadTexture("tree/Textures/leaves_02.jpg"));
-	leaves2Mat->SetTexture("alphaTexure", TextureLoader::LoadTexture("tree/Textures/leaves_alpha.jpg"));
-	leaves2Mat->SetDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
-	leaves2Mat->SetSpecular(glm::vec3(0.0f, 0.0f, 0.0f), 40.f);
-	leaves2MeshObjs[0]->SetMaterial(leaves1Mat);
+	leaves2Mat->SetTexture("alphaTexture", TextureLoader::LoadTexture("tree/Textures/leaves_alpha.jpg"));
+	// leaves2Mat->SetDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
+	leaves2MeshObjs[0]->SetMaterial(leaves2Mat);
 	TreeSceneObject->AddMeshObject(leaves2MeshObjs[0]);
 
-	std::vector<std::shared_ptr<MeshObject>> leaves2MeshObjs_rev = MeshLoader::LoadMesh("leaves_2_alpha_rev.obj", &leaveas2Materials);
-	leaves2MeshObjs_rev[0]->SetMaterial(leaves2Mat);
-	TreeSceneObject->AddMeshObject(leaves2MeshObjs_rev[0]);
+	//std::vector<std::shared_ptr<MeshObject>> leaves2MeshObjs_rev = MeshLoader::LoadMesh("leaves_2_alpha_rev.obj", &leaveas2Materials);
+	//leaves2MeshObjs_rev[0]->SetMaterial(leaves2Mat);
+	//TreeSceneObject->AddMeshObject(leaves2MeshObjs_rev[0]);
 
 	// leaves 3
 	std::vector<std::shared_ptr<aiMaterial>> leaveas3Materials;
@@ -163,15 +162,15 @@ std::shared_ptr<Scene> Assignment7::CreateScene() const
 	std::shared_ptr<BlinnPhongMaterial> leaves3Mat = std::make_shared<BlinnPhongMaterial>();
 	leaves3Mat->SetReflectivity(0.f);
 	leaves3Mat->SetTexture("diffuseTexture", TextureLoader::LoadTexture("tree/Textures/leaves_03.jpg"));
-	leaves3Mat->SetTexture("alphaTexure", TextureLoader::LoadTexture("tree/Textures/leaves_alpha.jpg"));
+	leaves3Mat->SetTexture("alphaTexture", TextureLoader::LoadTexture("tree/Textures/leaves_alpha.jpg"));
 	leaves3Mat->SetDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
 	leaves3Mat->SetSpecular(glm::vec3(0.0f, 0.0f, 0.0f), 40.f);
 	leaves3MeshObjs[0]->SetMaterial(leaves3Mat);
 	TreeSceneObject->AddMeshObject(leaves3MeshObjs[0]);
 
-	std::vector<std::shared_ptr<MeshObject>> leaves3MeshObjs_rev = MeshLoader::LoadMesh("leaves_3_rev.obj", &leaveas3Materials);
-	leaves3MeshObjs_rev[0]->SetMaterial(leaves3Mat);
-	TreeSceneObject->AddMeshObject(leaves3MeshObjs_rev[0]);
+	//std::vector<std::shared_ptr<MeshObject>> leaves3MeshObjs_rev = MeshLoader::LoadMesh("leaves_3_rev.obj", &leaveas3Materials);
+	//leaves3MeshObjs_rev[0]->SetMaterial(leaves3Mat);
+	//TreeSceneObject->AddMeshObject(leaves3MeshObjs_rev[0]);
 
 // Get Maya coordinates to match up: -forward to x, up to y and  right to z
 // currently  world up is y, world right is x, forward is -z 
@@ -245,7 +244,16 @@ std::shared_ptr<Scene> Assignment7::CreateScene() const
 	// SceneObject::GetWorldRight() // 1.f, 0.f, 0.f
 	// SceneObject::GetWorldUp() // 0.f, 1.f, 0.f
 	areaLight->Translate(glm::vec3(3.579f, -29.794f, 114.940));
+	areaLight->SetLightColor(glm::vec3(2.f, 2.f, 2.f));  // 2.f, 2.f, 2.f)); //1.f, 1.f, 1.f));
 
+
+	std::shared_ptr<Light> areaLight_sun = std::make_shared<AreaLight>(glm::vec2(30, 30));
+	// areaLight->SetPosition(glm::vec3(-114.940f, -29.794f, 3.579f));
+	areaLight->SetPosition(glm::vec3(100.f, 100.f, -70.f));
+	// SceneObject::GetWorldForward() // 0.f, 0.f, -1.f
+	// SceneObject::GetWorldRight() // 1.f, 0.f, 0.f
+	// SceneObject::GetWorldUp() // 0.f, 1.f, 0.f
+	areaLight->Translate(glm::vec3(3.579f, -29.794f, 114.940));
 	areaLight->SetLightColor(glm::vec3(2.f, 2.f, 2.f));  // 2.f, 2.f, 2.f)); //1.f, 1.f, 1.f));
 
 #if ACCELERATION_TYPE == 0
@@ -308,5 +316,5 @@ int Assignment7::GetMaxRefractionBounces() const
 glm::vec2 Assignment7::GetImageOutputResolution() const
 {
 	//	return glm::vec2(185*2, 138.75*2);// 4*640.f, 4*480.f);
-	return glm::vec2(185 * 5, 136 * 5);// 4*640.f, 4*480.f);
+	return glm::vec2(185 * 2, 136 * 2);// 4*640.f, 4*480.f);
 }

@@ -69,11 +69,17 @@ glm::vec3 Material::ComputeSpecular(const struct IntersectionState& intersection
 // if transparent return 1, else return 0
 bool Material::ComputeTransparency(const IntersectionState& intersection) const
 {
-	if (!textureStorage.count("alphaTexure")) {
+	if (textureStorage.find("alphaTexture") == textureStorage.end()) {
 		return false;
 	}
-	return (textureStorage.find("alphaTexure") != textureStorage.end()) ?
-		glm::vec3(textureStorage.at("alphaTexure")->Sample(intersection.ComputeUV()))[0] > 0 : 0;
+	glm::vec3 sample = glm::vec3(textureStorage.at("alphaTexture")->Sample(intersection.ComputeUV()));
+	if (sample[0] != 0) {
+		return true;
+	}
+	IntersectionState intersect_other_dir = intersection;
+	intersect_other_dir.intersectionRay.SetRayDirection(intersect_other_dir.intersectionRay.GetRayDirection() * -1.f);
+	sample = glm::vec3(textureStorage.at("alphaTexture")->Sample(intersect_other_dir.ComputeUV()));
+	return sample[0] > 0.0;
 }
 
 glm::vec3 Material::ComputeReflection(const class Renderer* renderer, const struct IntersectionState& intersection) const

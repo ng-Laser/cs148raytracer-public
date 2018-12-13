@@ -42,11 +42,13 @@ bool Scene::Trace(class Ray* inputRay, IntersectionState* outputIntersection) co
         
 		// Noa_TODO Here: take care of alpha
 		if (currentMaterial->ComputeTransparency(*outputIntersection)) {
-			outputIntersection->reflectionIntersection = std::make_shared<IntersectionState>(outputIntersection->remainingReflectionBounces - 1, outputIntersection->remainingRefractionBounces);
+			// outputIntersection->reflectionIntersection = std::make_shared<IntersectionState>(outputIntersection->remainingReflectionBounces - 1, outputIntersection->remainingRefractionBounces);
 
 			Ray reflectionRay;
 			PassRayThrough(reflectionRay, *inputRay, intersectionPoint);
-			return Trace(&reflectionRay, outputIntersection->reflectionIntersection.get());
+			return Trace(&reflectionRay, outputIntersection);
+
+
 			// don't do any other rays
 		}
 		// Noa_TODO Here: Take care of background
@@ -97,7 +99,7 @@ void Scene::PerformRayRefraction(Ray& outputRay, const Ray& inputRay, const glm:
 
 void Scene::PassRayThrough(Ray& outputRay, const Ray& inputRay, const glm::vec3& intersectionPoint) const
 {
-	outputRay.SetRayPosition(intersectionPoint + (inputRay.GetRayDirection() * .1f));
+	outputRay.SetRayPosition(intersectionPoint + (inputRay.GetRayDirection() * LARGE_EPSILON));
 	outputRay.SetRayDirection(inputRay.GetRayDirection());
 }
 
